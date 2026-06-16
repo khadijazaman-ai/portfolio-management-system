@@ -1,0 +1,16 @@
+{
+  "name": "mern-portfolio-hub",
+  "version": "1.0.0",
+  "description": "MERN Portfolio Hub — Portfolio Management System",
+  "scripts": {
+    "install-client": "npm install --prefix client",
+    "install-server": "npm install --prefix server",
+    "install-all": "npm run install-server && npm run install-client",
+    "client": "npm run dev --prefix client",
+    "server": "npm run dev --prefix server",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
