@@ -27,6 +27,7 @@ const app = express();
     app.use('/api/skills', require('./routes/skills'));
     app.use('/api/projects', require('./routes/projects'));
     app.use('/api/dashboard', require('./routes/dashboard'));
+    app.use('/api/categories', require('./routes/categories'));
 
     // Port configuration
     const PORT = process.env.PORT || 5000;

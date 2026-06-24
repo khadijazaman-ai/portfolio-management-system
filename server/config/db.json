@@ -1,0 +1,525 @@
+{
+  "users": [
+    {
+      "_id": "khadija_00001",
+      "name": "Khadija Zaman",
+      "email": "khadijazaman.ai@gmail.com",
+      "password": "$2a$10$0fDb6CDtA4QnNxb.aOnGvuNfzCP4pBnDcHkhlqT1B5xrpirG56Kkq",
+      "about": "Motivated Computer Science student with hands-on experience in front-end development and Python programming gained through industry internships. Actively developing full-stack web development skills and exploring AI/ML fundamentals. Committed to writing clean, functional code and delivering practical solutions.",
+      "role": "Front-End Developer & Full-Stack Engineer",
+      "tagline": "Designing and building next-generation web applications with clean architecture",
+      "profileImage": "data:image/jpeg;base64,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",
+      "education": "Bachelor of Science in Computer Science, COMSATS University (2023 - 2027)",
+      "careerGoals": "To leverage my development skills to build robust, scalable SaaS solutions and integrate AI/ML algorithms to solve real-world problems.",
+      "interests": "Full Stack Development, AI/ML, Open Source Contribution, UI/UX Design",
+      "location": "Swabi, KPK",
+      "phone": "",
+      "linkedin": "https://linkedin.com/in/khadija-zaman",
+      "github": "https://github.com/khadijazaman-ai",
+      "website": "https://khadijazaman.dev",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-24T08:38:53.124Z"
+    },
+    {
+      "name": "Khadija Zaman",
+      "email": "khadijazaman.ai@gmail.com",
+      "password": "$2a$10$0fDb6CDtA4QnNxb.aOnGvuNfzCP4pBnDcHkhlqT1B5xrpirG56Kkq",
+      "role": "Front-End Developer & Full-Stack Engineer",
+      "tagline": "Designing and building next-generation web applications with clean architecture",
+      "profileImage": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250",
+      "about": "Motivated Computer Science student with hands-on experience in front-end development and Python programming gained through industry internships. Actively developing full-stack web development skills and exploring AI/ML fundamentals. Committed to writing clean, functional code and delivering practical solutions.",
+      "education": "Bachelor of Science in Computer Science, COMSATS University (2023 - 2027)",
+      "careerGoals": "To leverage my development skills to build robust, scalable SaaS solutions and integrate AI/ML algorithms to solve real-world problems.",
+      "interests": "Full Stack Development, AI/ML, Open Source Contribution, UI/UX Design",
+      "location": "Yarhussain, Swabi, KPK",
+      "phone": "0346-5586036",
+      "linkedin": "https://linkedin.com/in/khadija-zaman",
+      "github": "https://github.com/khadijazaman-ai",
+      "website": "https://khadijazaman.dev",
+      "_id": "0nx5gfzddy8amaddr9",
+      "updatedAt": "2026-06-23T13:32:14.563Z",
+      "createdAt": "2026-06-23T13:25:54.251Z"
+    }
+  ],
+  "skills": [
+    {
+      "_id": "skill_1",
+      "user": "khadija_00001",
+      "name": "React.js",
+      "category": "Frontend",
+      "level": "Advanced",
+      "proficiency": 90,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_2",
+      "user": "khadija_00001",
+      "name": "HTML5 / CSS3",
+      "category": "Frontend",
+      "level": "Advanced",
+      "proficiency": 95,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_3",
+      "user": "khadija_00001",
+      "name": "JavaScript",
+      "category": "Frontend",
+      "level": "Advanced",
+      "proficiency": 88,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_4",
+      "user": "khadija_00001",
+      "name": "Node.js & Express",
+      "category": "Backend",
+      "level": "Intermediate",
+      "proficiency": 75,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_5",
+      "user": "khadija_00001",
+      "name": "Python",
+      "category": "AI/ML",
+      "level": "Intermediate",
+      "proficiency": 80,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_6",
+      "user": "khadija_00001",
+      "name": "MongoDB",
+      "category": "Database",
+      "level": "Intermediate",
+      "proficiency": 70,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_7",
+      "user": "khadija_00001",
+      "name": "Docker",
+      "category": "DevOps",
+      "level": "Beginner",
+      "proficiency": 45,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "skill_8",
+      "user": "khadija_00001",
+      "name": "Git & GitHub",
+      "category": "Tools",
+      "level": "Advanced",
+      "proficiency": 90,
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "name": "React.js",
+      "category": "Frontend",
+      "level": "Advanced",
+      "proficiency": 90,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "wq3cumpjv72m2tsvhp",
+      "updatedAt": "2026-06-23T13:25:54.252Z",
+      "createdAt": "2026-06-23T13:25:54.252Z"
+    },
+    {
+      "name": "HTML5 / CSS3",
+      "category": "Frontend",
+      "level": "Advanced",
+      "proficiency": 95,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "pbnxl717cor1ubah56",
+      "updatedAt": "2026-06-23T13:25:54.252Z",
+      "createdAt": "2026-06-23T13:25:54.252Z"
+    },
+    {
+      "name": "JavaScript",
+      "category": "Frontend",
+      "level": "Advanced",
+      "proficiency": 88,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "5cwi0hiu8pc1tiw6xu",
+      "updatedAt": "2026-06-23T13:25:54.253Z",
+      "createdAt": "2026-06-23T13:25:54.253Z"
+    },
+    {
+      "name": "Node.js & Express",
+      "category": "Backend",
+      "level": "Intermediate",
+      "proficiency": 75,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "ugpabecnyihf51dq02",
+      "updatedAt": "2026-06-23T13:25:54.253Z",
+      "createdAt": "2026-06-23T13:25:54.253Z"
+    },
+    {
+      "name": "Python",
+      "category": "AI/ML",
+      "level": "Intermediate",
+      "proficiency": 80,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "7ijicd68gj42s55ffi",
+      "updatedAt": "2026-06-23T13:25:54.254Z",
+      "createdAt": "2026-06-23T13:25:54.254Z"
+    },
+    {
+      "name": "MongoDB",
+      "category": "Database",
+      "level": "Intermediate",
+      "proficiency": 70,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "ujfez1575ymskutgdo",
+      "updatedAt": "2026-06-23T13:25:54.254Z",
+      "createdAt": "2026-06-23T13:25:54.254Z"
+    },
+    {
+      "name": "Docker",
+      "category": "DevOps",
+      "level": "Beginner",
+      "proficiency": 45,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "nlzay49ftrfkg5kze6",
+      "updatedAt": "2026-06-23T13:25:54.255Z",
+      "createdAt": "2026-06-23T13:25:54.255Z"
+    },
+    {
+      "name": "Git & GitHub",
+      "category": "Tools",
+      "level": "Advanced",
+      "proficiency": 90,
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "tzgbuahipq41i2e8v0",
+      "updatedAt": "2026-06-23T13:25:54.255Z",
+      "createdAt": "2026-06-23T13:25:54.255Z"
+    }
+  ],
+  "projects": [
+    {
+      "_id": "proj_1",
+      "user": "khadija_00001",
+      "title": "Personal Portfolio Website",
+      "description": "A premium, responsive full-stack portfolio built with React, Node.js, and MongoDB featuring an admin dashboard, stats analytics, and dark/light modes.",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "MongoDB",
+        "Tailwind CSS"
+      ],
+      "category": "Web Development",
+      "imageUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/portfolio-management-system",
+      "githubUrl": "https://github.com/khadijazaman-ai/portfolio-management-system",
+      "liveLink": "https://khadijazaman.dev",
+      "liveUrl": "https://khadijazaman.dev",
+      "status": "Completed",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "proj_2",
+      "user": "khadija_00001",
+      "title": "Student Record Management System",
+      "description": "Console-based C++ application using object-oriented programming (OOP) principles and file stream handling for secure student academic records storage.",
+      "technologies": [
+        "C++",
+        "File Systems",
+        "OOP"
+      ],
+      "category": "Other",
+      "imageUrl": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/student-records",
+      "githubUrl": "https://github.com/khadijazaman-ai/student-records",
+      "liveLink": "",
+      "liveUrl": "",
+      "status": "Completed",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "proj_3",
+      "user": "khadija_00001",
+      "title": "Mobile Attendance App",
+      "description": "Flutter-based mobile app for classroom attendance management with automatic CSV export and barcode scanning capabilities.",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Firebase"
+      ],
+      "category": "Mobile Development",
+      "imageUrl": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/attendance-app",
+      "githubUrl": "https://github.com/khadijazaman-ai/attendance-app",
+      "liveLink": "",
+      "liveUrl": "",
+      "status": "In Progress",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "proj_4",
+      "user": "khadija_00001",
+      "title": "Visual Sentiment Classifier",
+      "description": "A PyTorch-based neural network model for image-based sentiment prediction, trained on subset ImageNet dataset.",
+      "technologies": [
+        "Python",
+        "PyTorch",
+        "CNN"
+      ],
+      "category": "AI/ML",
+      "imageUrl": "https://images.unsplash.com/photo-1527474305487-b87b222841cc?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/sentiment-classifier",
+      "githubUrl": "https://github.com/khadijazaman-ai/sentiment-classifier",
+      "liveLink": "",
+      "liveUrl": "",
+      "status": "Planned",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "title": "Personal Portfolio Website",
+      "description": "A premium, responsive full-stack portfolio built with React, Node.js, and MongoDB featuring an admin dashboard, stats analytics, and dark/light modes.",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "MongoDB",
+        "Tailwind CSS"
+      ],
+      "category": "Web Development",
+      "imageUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/portfolio-management-system",
+      "githubUrl": "https://github.com/khadijazaman-ai/portfolio-management-system",
+      "liveLink": "https://khadijazaman.dev",
+      "liveUrl": "https://khadijazaman.dev",
+      "status": "Completed",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "u9rdxbfx7ae8ci5oiw",
+      "updatedAt": "2026-06-23T13:25:54.256Z",
+      "createdAt": "2026-06-23T13:25:54.256Z"
+    },
+    {
+      "title": "Student Record Management System",
+      "description": "Console-based C++ application using object-oriented programming (OOP) principles and file stream handling for secure student academic records storage.",
+      "technologies": [
+        "C++",
+        "File Systems",
+        "OOP"
+      ],
+      "category": "Other",
+      "imageUrl": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/student-records",
+      "githubUrl": "https://github.com/khadijazaman-ai/student-records",
+      "liveLink": "",
+      "liveUrl": "",
+      "status": "Completed",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "baqdk17uy9ttp58nyf",
+      "updatedAt": "2026-06-23T13:25:54.257Z",
+      "createdAt": "2026-06-23T13:25:54.257Z"
+    },
+    {
+      "title": "Mobile Attendance App",
+      "description": "Flutter-based mobile app for classroom attendance management with automatic CSV export and barcode scanning capabilities.",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Firebase"
+      ],
+      "category": "Mobile Development",
+      "imageUrl": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/attendance-app",
+      "githubUrl": "https://github.com/khadijazaman-ai/attendance-app",
+      "liveLink": "",
+      "liveUrl": "",
+      "status": "In Progress",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "q8wy1zy3x50ihf72a6",
+      "updatedAt": "2026-06-23T13:25:54.258Z",
+      "createdAt": "2026-06-23T13:25:54.258Z"
+    },
+    {
+      "title": "Visual Sentiment Classifier",
+      "description": "A PyTorch-based neural network model for image-based sentiment prediction, trained on subset ImageNet dataset.",
+      "technologies": [
+        "Python",
+        "PyTorch",
+        "CNN"
+      ],
+      "category": "AI/ML",
+      "imageUrl": "https://images.unsplash.com/photo-1527474305487-b87b222841cc?auto=format&fit=crop&q=80&w=600",
+      "githubLink": "https://github.com/khadijazaman-ai/sentiment-classifier",
+      "githubUrl": "https://github.com/khadijazaman-ai/sentiment-classifier",
+      "liveLink": "",
+      "liveUrl": "",
+      "status": "Planned",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "to0qoci01u03budrri",
+      "updatedAt": "2026-06-23T13:25:54.259Z",
+      "createdAt": "2026-06-23T13:25:54.259Z"
+    }
+  ],
+  "categories": [
+    {
+      "_id": "cat_1",
+      "user": "khadija_00001",
+      "name": "Web Development",
+      "slug": "web-development",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "cat_2",
+      "user": "khadija_00001",
+      "name": "Mobile Development",
+      "slug": "mobile-development",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "cat_3",
+      "user": "khadija_00001",
+      "name": "AI/ML",
+      "slug": "ai-ml",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "_id": "cat_4",
+      "user": "khadija_00001",
+      "name": "Other",
+      "slug": "other",
+      "createdAt": "2026-06-23T12:40:21.769Z",
+      "updatedAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "name": "Web Development",
+      "slug": "web-development",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "7u5ihnq40qqzk1ilga",
+      "updatedAt": "2026-06-23T13:25:54.260Z",
+      "createdAt": "2026-06-23T13:25:54.260Z"
+    },
+    {
+      "name": "Mobile Development",
+      "slug": "mobile-development",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "rzf8t14kl0yx71a4l9",
+      "updatedAt": "2026-06-23T13:25:54.260Z",
+      "createdAt": "2026-06-23T13:25:54.260Z"
+    },
+    {
+      "name": "AI/ML",
+      "slug": "ai-ml",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "u40o1r3x8n26zy6f16",
+      "updatedAt": "2026-06-23T13:25:54.261Z",
+      "createdAt": "2026-06-23T13:25:54.261Z"
+    },
+    {
+      "name": "Other",
+      "slug": "other",
+      "user": "0nx5gfzddy8amaddr9",
+      "_id": "2sfxo669xb7xzfj6x7",
+      "updatedAt": "2026-06-23T13:25:54.261Z",
+      "createdAt": "2026-06-23T13:25:54.261Z"
+    }
+  ],
+  "activities": [
+    {
+      "_id": "act_1",
+      "user": "khadija_00001",
+      "action": "System Initialized",
+      "details": "Local database seeded successfully.",
+      "createdAt": "2026-06-23T12:40:21.769Z"
+    },
+    {
+      "user": "0nx5gfzddy8amaddr9",
+      "action": "Account Created",
+      "details": "Profile initialized with default dashboard assets.",
+      "_id": "5jtwotek6h914cnjzq",
+      "updatedAt": "2026-06-23T13:25:54.262Z",
+      "createdAt": "2026-06-23T13:25:54.262Z"
+    },
+    {
+      "user": "0nx5gfzddy8amaddr9",
+      "action": "Updated Profile",
+      "details": "Updated basic profile info",
+      "_id": "8noqb6kpsi2d2j8tbj",
+      "updatedAt": "2026-06-23T13:29:13.252Z",
+      "createdAt": "2026-06-23T13:29:13.252Z"
+    },
+    {
+      "user": "0nx5gfzddy8amaddr9",
+      "action": "Updated Profile",
+      "details": "Updated basic profile info",
+      "_id": "h9nbcsj6ml3st34xgv",
+      "updatedAt": "2026-06-23T13:32:14.565Z",
+      "createdAt": "2026-06-23T13:32:14.565Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "User Login",
+      "details": "Logged into the CMS Dashboard.",
+      "_id": "mu5utcaj7twcg4cto8",
+      "updatedAt": "2026-06-23T17:05:47.041Z",
+      "createdAt": "2026-06-23T17:05:47.041Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "Updated Profile",
+      "details": "Updated basic profile info",
+      "_id": "99smxgluzc2za831la",
+      "updatedAt": "2026-06-23T17:06:05.471Z",
+      "createdAt": "2026-06-23T17:06:05.471Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "Updated Profile",
+      "details": "Updated contact details",
+      "_id": "kvjwib8uo65ffnpk43",
+      "updatedAt": "2026-06-23T17:06:26.492Z",
+      "createdAt": "2026-06-23T17:06:26.492Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "Updated Profile",
+      "details": "Updated social links",
+      "_id": "3a04gn7ynkv6fr5j2n",
+      "updatedAt": "2026-06-23T17:06:33.234Z",
+      "createdAt": "2026-06-23T17:06:33.234Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "Updated Profile",
+      "details": "Updated basic profile info",
+      "_id": "3y1p1lc2lqrnxk2zyo",
+      "updatedAt": "2026-06-23T17:06:36.027Z",
+      "createdAt": "2026-06-23T17:06:36.027Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "User Login",
+      "details": "Logged into the CMS Dashboard.",
+      "_id": "uweu9l6jzpz1zafp8f",
+      "updatedAt": "2026-06-23T17:21:59.687Z",
+      "createdAt": "2026-06-23T17:21:59.687Z"
+    },
+    {
+      "user": "khadija_00001",
+      "action": "User Login",
+      "details": "Logged into the CMS Dashboard.",
+      "_id": "odh67kzhqju2otx8v9",
+      "updatedAt": "2026-06-24T08:38:53.127Z",
+      "createdAt": "2026-06-24T08:38:53.127Z"
+    }
+  ]
+}

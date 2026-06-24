@@ -7,6 +7,7 @@ import Skills from './pages/Skills';
 import Projects from './pages/Projects';
 import Portfolio from './pages/Portfolio';
 import PublicPortfolio from './pages/PublicPortfolio';
+import Categories from './pages/Categories';
 import DashboardLayout from './components/DashboardLayout';
 
 function PrivateRoute({ children }) {
@@ -41,6 +42,7 @@ function AppContent() {
         <Route path="/dashboard" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="profile" element={<Portfolio />} />
+          <Route path="categories" element={<Categories />} />
           <Route path="skills" element={<Skills />} />
           <Route path="projects" element={<Projects />} />
         </Route>

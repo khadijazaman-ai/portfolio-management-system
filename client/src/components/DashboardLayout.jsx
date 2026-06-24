@@ -12,9 +12,13 @@ import {
   Sun, 
   Moon, 
   Bell,
-  Briefcase
+  Briefcase,
+  Layers,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import FloatingPaths from './FloatingPaths';
+import PreviewFrame from './PreviewFrame';
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
@@ -22,9 +26,44 @@ export default function DashboardLayout() {
   const location = useLocation();
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'dark';
   });
+  const [previewWidth, setPreviewWidth] = useState(() => {
+    return parseInt(localStorage.getItem('previewWidth')) || 480;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth >= 320 && newWidth <= Math.min(1000, window.innerWidth * 0.6)) {
+        setPreviewWidth(newWidth);
+        localStorage.setItem('previewWidth', newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -49,6 +88,7 @@ export default function DashboardLayout() {
   const menuItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Profile', path: '/dashboard/profile', icon: User },
+    { label: 'Categories', path: '/dashboard/categories', icon: Layers },
     { label: 'Skills', path: '/dashboard/skills', icon: Cpu },
     { label: 'Projects', path: '/dashboard/projects', icon: FolderGit2 },
   ];
@@ -64,7 +104,7 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-bg text-text flex">
+    <div className="h-screen bg-bg text-text flex overflow-hidden">
       
       {/* Sidebar for Desktop */}
       <aside className={`hidden md:flex flex-col w-64 bg-surface border-r border-border shrink-0 z-20`}>
@@ -191,7 +231,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Container */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen relative">
+      <div className="flex-1 flex flex-col min-w-0 h-screen relative overflow-hidden">
         <FloatingPaths />
         {/* Topbar */}
         <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 sticky top-0 backdrop-blur-md bg-surface/90">
@@ -208,11 +248,25 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Live Preview Toggle Button */}
+            <button
+              onClick={() => setShowPreview(prev => !prev)}
+              className={`flex items-center gap-1.5 text-xs font-bold border px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                showPreview
+                  ? 'bg-primary text-white border-primary shadow'
+                  : 'text-text-muted hover:text-text border-border hover:bg-surface/80 bg-bg/40'
+              }`}
+              title="Toggle Live Split-Preview"
+            >
+              {showPreview ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              {showPreview ? 'Hide Preview' : 'Live Preview'}
+            </button>
+
             {/* View Live Portfolio Link */}
             <Link
               to={`/portfolio-view/${user?.id || ''}`}
               target="_blank"
-              className="text-xs font-bold text-primary hover:text-primary-dark border border-primary/20 hover:border-primary/40 px-3.5 py-1.5 rounded-lg bg-primary/5 transition-all"
+              className="text-xs font-bold text-primary hover:text-primary-dark border border-primary/20 hover:border-primary/40 px-3 py-1.5 rounded-lg bg-primary/5 transition-all"
             >
               View Live Portfolio
             </Link>
@@ -247,10 +301,44 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        {/* Content View Outlet */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative z-10">
-          <Outlet />
-        </main>
+        {/* Content & Preview Split Container */}
+        <div className="flex-1 flex overflow-hidden relative">
+          {/* Left: Content View Outlet */}
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative z-10 custom-scrollbar">
+            <Outlet context={{ showPreview }} />
+          </main>
+
+          {/* Right: Live Preview Split Pane (Desktops) */}
+          {showPreview && (
+            <div 
+              style={{ width: `${previewWidth}px` }}
+              className="hidden lg:flex border-l border-border bg-surface/50 backdrop-blur-md p-4 shrink-0 flex-col z-20 relative animate-in slide-in-from-right duration-300"
+            >
+              {/* Resize Divider Drag Handle */}
+              <div 
+                onMouseDown={startResizing}
+                className={`absolute top-0 bottom-0 left-0 w-1.5 cursor-col-resize hover:bg-primary/40 transition-colors z-30 flex items-center justify-center group ${isResizing ? 'bg-primary' : ''}`}
+                title="Drag to resize preview"
+              >
+                <div className="w-[2px] h-6 bg-text-muted/30 group-hover:bg-primary/60 rounded-full transition-colors"></div>
+              </div>
+
+              {/* Prevent iframe from absorbing mouse events during drag resizing */}
+              {isResizing && (
+                <div className="absolute inset-0 bg-transparent z-40 cursor-col-resize"></div>
+              )}
+
+              <PreviewFrame url={`${window.location.origin}/portfolio-view/${user?.id || ''}?preview=true`} />
+            </div>
+          )}
+        </div>
+
+        {/* Floating overlay drawer for smaller devices */}
+        {showPreview && (
+          <div className="lg:hidden fixed inset-y-16 right-0 w-full sm:w-[450px] bg-slate-950 border-l border-border p-4 z-35 flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
+            <PreviewFrame url={`${window.location.origin}/portfolio-view/${user?.id || ''}?preview=true`} />
+          </div>
+        )}
       </div>
 
     </div>

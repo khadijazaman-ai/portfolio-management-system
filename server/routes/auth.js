@@ -110,11 +110,29 @@ router.post('/register', async (req, res) => {
       }
     ];
 
+    const Category = require('../models/Category');
+    const defaultCategories = [
+      { name: 'Web Development', slug: 'web-development' },
+      { name: 'Mobile Development', slug: 'mobile-development' },
+      { name: 'AI/ML', slug: 'ai-ml' },
+      { name: 'Other', slug: 'other' }
+    ];
+
     // Save default entities in parallel
     await Promise.all([
       ...defaultSkills.map(s => new Skill({ ...s, user: user._id }).save()),
-      ...defaultProjects.map(p => new Project({ ...p, user: user._id }).save())
+      ...defaultProjects.map(p => new Project({ ...p, user: user._id }).save()),
+      ...defaultCategories.map(c => new Category({ ...c, user: user._id }).save())
     ]);
+
+    // Log registration activity
+    const Activity = require('../models/Activity');
+    const registerActivity = new Activity({
+      user: user._id,
+      action: 'Account Created',
+      details: 'Profile initialized with default dashboard assets.'
+    });
+    await registerActivity.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({
@@ -149,6 +167,19 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    // Increment login count
+    user.loginCount = (user.loginCount || 0) + 1;
+    await user.save();
+
+    // Log login activity
+    const Activity = require('../models/Activity');
+    const loginActivity = new Activity({
+      user: user._id,
+      action: 'User Login',
+      details: 'Logged into the CMS Dashboard.'
+    });
+    await loginActivity.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({

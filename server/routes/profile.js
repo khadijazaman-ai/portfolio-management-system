@@ -46,6 +46,9 @@ router.put('/', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const Activity = require('../models/Activity');
+    await new Activity({ user: req.user, action: 'Updated Profile', details: 'Updated basic profile info' }).save();
+
     res.json(user);
   } catch (err) {
     console.error('Update profile basic info error:', err);
@@ -70,6 +73,9 @@ router.put('/about', auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    const Activity = require('../models/Activity');
+    await new Activity({ user: req.user, action: 'Updated Profile', details: 'Updated biography & education' }).save();
 
     res.json(user);
   } catch (err) {
@@ -96,6 +102,9 @@ router.put('/contact', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const Activity = require('../models/Activity');
+    await new Activity({ user: req.user, action: 'Updated Profile', details: 'Updated contact details' }).save();
+
     res.json(user);
   } catch (err) {
     console.error('Update profile contact error:', err);
@@ -120,6 +129,9 @@ router.put('/social', auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    const Activity = require('../models/Activity');
+    await new Activity({ user: req.user, action: 'Updated Profile', details: 'Updated social links' }).save();
 
     res.json(user);
   } catch (err) {
@@ -225,10 +237,22 @@ router.post('/seed', auth, async (req, res) => {
       }
     ];
 
+    const Category = require('../models/Category');
+    const defaultCategories = [
+      { name: 'Web Development', slug: 'web-development' },
+      { name: 'Mobile Development', slug: 'mobile-development' },
+      { name: 'AI/ML', slug: 'ai-ml' },
+      { name: 'Other', slug: 'other' }
+    ];
+
     await Promise.all([
       ...defaultSkills.map(s => new Skill({ ...s, user: userId }).save()),
-      ...defaultProjects.map(p => new Project({ ...p, user: userId }).save())
+      ...defaultProjects.map(p => new Project({ ...p, user: userId }).save()),
+      ...defaultCategories.map(c => new Category({ ...c, user: userId }).save())
     ]);
+
+    const Activity = require('../models/Activity');
+    await new Activity({ user: userId, action: 'Seeded Portfolio', details: 'Loaded default profile database assets' }).save();
 
     res.json({ success: true, message: 'Default portfolio data seeded successfully!', user });
   } catch (err) {

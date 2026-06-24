@@ -29,11 +29,11 @@ export default function Portfolio() {
   const headers = { Authorization: `Bearer ${token}` };
 
   const [activeTab, setActiveTab] = useState('basic');
+  const [profileImage, setProfileImage] = useState('');
   const [form, setForm] = useState({
     name: '',
     role: '',
     tagline: '',
-    profileImage: '',
     about: '',
     education: '',
     careerGoals: '',
@@ -51,6 +51,37 @@ export default function Portfolio() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const compressImage = (base64Str, maxWidth = 800, maxHeight = 600, quality = 0.7) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(base64Str);
+    });
+  };
+
   const handleImageUpload = (e) => {
     setError('');
     setSuccess('');
@@ -63,9 +94,15 @@ export default function Portfolio() {
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm(prev => ({ ...prev, profileImage: reader.result }));
-      setSuccess('Image uploaded successfully! Save changes to apply.');
+    reader.onloadend = async () => {
+      try {
+        const compressed = await compressImage(reader.result);
+        setProfileImage(compressed);
+        setSuccess('Image uploaded and compressed successfully! Save changes to apply.');
+      } catch (err) {
+        setProfileImage(reader.result);
+        setSuccess('Image uploaded successfully! Save changes to apply.');
+      }
     };
     reader.onerror = () => {
       setError('Error reading file.');
@@ -83,7 +120,6 @@ export default function Portfolio() {
           name: data.name || '',
           role: data.role || '',
           tagline: data.tagline || '',
-          profileImage: data.profileImage || '',
           about: data.about || '',
           education: data.education || '',
           careerGoals: data.careerGoals || '',
@@ -95,6 +131,7 @@ export default function Portfolio() {
           github: data.github || '',
           website: data.website || ''
         });
+        setProfileImage(data.profileImage || '');
       } catch (err) {
         console.error(err);
         if (err.response?.status === 401) {
@@ -110,6 +147,18 @@ export default function Portfolio() {
 
     fetchPortfolio();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      window.postMessage({
+        type: 'PREVIEW_PROFILE_UPDATE',
+        data: {
+          ...form,
+          profileImage
+        }
+      }, '*');
+    }
+  }, [form, profileImage, loading]);
 
   const validateUrls = (fields) => {
     const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
@@ -149,7 +198,7 @@ export default function Portfolio() {
           name: form.name,
           role: form.role,
           tagline: form.tagline,
-          profileImage: form.profileImage
+          profileImage: profileImage
         };
       } else if (section === 'about') {
         endpoint = `${API_URL}/api/profile/about`;
@@ -281,9 +330,9 @@ export default function Portfolio() {
               {/* Live Image Preview */}
               <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-2xl bg-surface/80 border border-border clay-card">
                 <div className="h-20 w-20 rounded-full border-2 border-primary/20 overflow-hidden shrink-0 bg-bg flex items-center justify-center shadow-inner">
-                  {form.profileImage ? (
+                  {profileImage ? (
                     <img 
-                      src={form.profileImage} 
+                      src={profileImage} 
                       alt="Avatar Preview" 
                       className="h-full w-full object-cover animate-fade-in"
                       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250'; }}
@@ -376,8 +425,8 @@ export default function Portfolio() {
                       </label>
                       <input
                         type="url"
-                        value={form.profileImage}
-                        onChange={(e) => setForm({ ...form, profileImage: e.target.value })}
+                        value={profileImage.startsWith('data:') ? '' : profileImage}
+                        onChange={(e) => setProfileImage(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl glass-input text-xs"
                         placeholder="https://images.unsplash.com/photo-..."
                       />

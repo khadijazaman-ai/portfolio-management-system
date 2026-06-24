@@ -16,3 +16,7 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 C:/Users/zaida/
+
+# Duplicated project folder for friend
+duplicated-portfolio/
+

@@ -41,12 +41,12 @@ export default function Projects() {
   const [statusFilter, setStatusFilter] = useState('All');
 
   // Form states inside modal
+  const [projectImage, setProjectImage] = useState('');
   const [form, setForm] = useState({
     title: '',
     description: '',
     category: 'Web Development',
     status: 'Completed',
-    imageUrl: '',
     githubUrl: '',
     liveUrl: ''
   });
@@ -56,8 +56,23 @@ export default function Projects() {
   const [editId, setEditId] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const categories = ['Web Development', 'Mobile Development', 'AI/ML', 'Data Analysis', 'Other'];
+  const [categories, setCategories] = useState(['Web Development', 'Mobile Development', 'AI/ML', 'Other']);
   const statuses = ['Completed', 'In Progress', 'Planned'];
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/categories`, { headers });
+      if (res.data && res.data.length > 0) {
+        setCategories(res.data.map(c => c.name));
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   // 1. Debounce Search Input (300ms)
   useEffect(() => {
@@ -137,6 +152,62 @@ export default function Projects() {
     return true;
   };
 
+  const compressImage = (base64Str, maxWidth = 800, maxHeight = 600, quality = 0.7) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(base64Str);
+    });
+  };
+
+  const handleImageUpload = (e) => {
+    setError('');
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Image size must be less than 4MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (uploadEvent) => {
+      try {
+        const compressed = await compressImage(uploadEvent.target.result);
+        setProjectImage(compressed);
+      } catch (err) {
+        setProjectImage(uploadEvent.target.result);
+      }
+    };
+    reader.onerror = () => {
+      setError('Failed to read image file.');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setError('');
@@ -160,6 +231,7 @@ export default function Projects() {
     
     const projectPayload = {
       ...form,
+      imageUrl: projectImage,
       githubUrl: sanitizeUrl(form.githubUrl),
       githubLink: sanitizeUrl(form.githubUrl),
       liveUrl: sanitizeUrl(form.liveUrl),
@@ -192,10 +264,10 @@ export default function Projects() {
       description: project.description,
       category: project.category || 'Web Development',
       status: project.status || 'Completed',
-      imageUrl: project.imageUrl || '',
       githubUrl: project.githubUrl || project.githubLink || '',
       liveUrl: project.liveUrl || project.liveLink || ''
     });
+    setProjectImage(project.imageUrl || '');
     setTechnologies(project.technologies || []);
     setEditId(project._id);
     setShowModal(true);
@@ -222,10 +294,10 @@ export default function Projects() {
       description: '',
       category: 'Web Development',
       status: 'Completed',
-      imageUrl: '',
       githubUrl: '',
       liveUrl: ''
     });
+    setProjectImage('');
     setTechnologies([]);
     setTechInput('');
     setEditId(null);
@@ -238,10 +310,10 @@ export default function Projects() {
       description: '',
       category: 'Web Development',
       status: 'Completed',
-      imageUrl: '',
       githubUrl: '',
       liveUrl: ''
     });
+    setProjectImage('');
     setTechnologies([]);
     setTechInput('');
     setEditId(null);
@@ -571,19 +643,58 @@ export default function Projects() {
 
                 {/* Right Side fields */}
                 <div className="space-y-4">
-                  {/* Image URL */}
+                  {/* Showcase Image Upload & URL */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-2 flex items-center gap-1">
-                      <Link2 className="h-3.5 w-3.5 text-text-muted/60" />
-                      Project Showcase Image URL
+                      <FolderGit2 className="h-3.5 w-3.5 text-text-muted/60" />
+                      Project Showcase Image
                     </label>
-                    <input
-                      type="url"
-                      value={form.imageUrl}
-                      onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
-                      placeholder="https://images.unsplash.com/photo-..."
-                    />
+
+                    {projectImage && (
+                      <div className="relative rounded-xl overflow-hidden border border-border mb-3 max-h-40 group">
+                        <img 
+                          src={projectImage} 
+                          alt="Project Preview" 
+                          className="w-full h-32 object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setProjectImage('')}
+                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold text-xs transition-opacity duration-200"
+                        >
+                          Remove Image
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      {/* Local File Selector */}
+                      <label className="w-full flex flex-col items-center justify-center border border-dashed border-border hover:border-primary/50 hover:bg-primary/5 px-4 py-3 rounded-xl cursor-pointer transition-all">
+                        <Plus className="h-5 w-5 text-text-muted mb-1" />
+                        <span className="text-xs font-semibold text-text">Choose local file</span>
+                        <span className="text-[10px] text-text-muted mt-0.5">Max size 4MB</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleImageUpload} 
+                          className="hidden" 
+                        />
+                      </label>
+
+                      {/* URL input */}
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted/60">
+                          <Link2 className="h-3.5 w-3.5" />
+                        </div>
+                        <input
+                          type="url"
+                          value={projectImage.startsWith('data:') ? '' : projectImage}
+                          onChange={(e) => setProjectImage(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2.5 rounded-xl glass-input text-xs"
+                          placeholder="Or paste an image URL..."
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   {/* GitHub URL */}

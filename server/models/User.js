@@ -69,6 +69,10 @@ const UserSchema = new mongoose.Schema({
   website: {
     type: String,
     default: ''
+  },
+  loginCount: {
+    type: Number,
+    default: 1
   }
 }, {
   timestamps: true

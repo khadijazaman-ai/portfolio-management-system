@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
@@ -21,11 +21,15 @@ import {
   Plus,
   Compass,
   Code,
-  Sparkles
+  Sparkles,
+  History,
+  Clock,
+  Copy,
+  Check
 } from 'lucide-react';
 
 // Custom SVG Donut Chart
-function SVGDonutChart({ data }) {
+function SVGDonutChart({ data, showPreview }) {
   const total = Object.values(data).reduce((sum, val) => sum + val, 0);
   if (total === 0) return <div className="text-center text-text-muted py-6">No data available</div>;
 
@@ -37,7 +41,7 @@ function SVGDonutChart({ data }) {
   const circumference = 2 * Math.PI * radius;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-8 justify-center">
+    <div className={`flex ${showPreview ? 'flex-col xl:flex-col 2xl:flex-row' : 'flex-col sm:flex-row'} items-center gap-8 justify-center`}>
       {/* SVG Ring */}
       <div className="relative w-36 h-36 shrink-0">
         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
@@ -90,6 +94,7 @@ export default function Dashboard() {
   const { token, logout, user } = useAuth();
   const navigate = useNavigate();
   const headers = { Authorization: `Bearer ${token}` };
+  const { showPreview } = useOutletContext() || {};
 
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
@@ -98,6 +103,22 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [seeding, setSeeding] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return 'recently';
+    const diff = new Date() - new Date(dateString);
+    const secs = Math.floor(diff / 1000);
+    const mins = Math.floor(secs / 60);
+    const hours = Math.floor(mins / 60);
+    const days = Math.floor(hours / 24);
+
+    if (secs < 60) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days === 1) return 'yesterday';
+    return `${days}d ago`;
+  };
 
   const fetchDashboardData = async (showLoading = true) => {
     try {
@@ -203,7 +224,7 @@ export default function Dashboard() {
       )}
 
       {/* Welcome Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 clay-card p-6">
+      <div className={`flex flex-col ${showPreview ? 'xl:flex-row xl:items-center' : 'md:flex-row md:items-center'} justify-between gap-4 clay-card p-6`}>
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-text flex items-center gap-2">
             Welcome back, {profile?.name || user?.name}
@@ -214,13 +235,29 @@ export default function Dashboard() {
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className={`flex flex-col ${showPreview ? 'xl:flex-row xl:items-center' : 'sm:flex-row sm:items-center'} gap-3`}>
+          <div className="flex items-center gap-2 bg-bg/50 border border-border px-3 py-1.5 rounded-xl text-xs max-w-[280px] sm:max-w-xs overflow-hidden">
+            <span className="text-text-muted select-none truncate shrink-0">Live URL:</span>
+            <span className="text-primary truncate select-all">{`${window.location.origin}/portfolio-view/${profile?._id || user?.id || ''}`}</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/portfolio-view/${profile?._id || user?.id || ''}`);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="text-text-muted hover:text-text cursor-pointer shrink-0"
+              title="Copy URL"
+            >
+              {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+            </button>
+          </div>
+          
           <Link
             to={`/portfolio-view/${profile?._id || user?.id || ''}`}
             target="_blank"
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-dark hover:from-primary hover:to-primary-dark text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-dark hover:from-primary hover:to-primary-dark text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-md transition-all cursor-pointer whitespace-nowrap"
           >
-            <Share2 className="h-4 w-4" />
+            <Share2 className="h-3.5 w-3.5" />
             View Live Site
           </Link>
         </div>
@@ -249,7 +286,7 @@ export default function Dashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${showPreview ? 'xl:grid-cols-2 2xl:grid-cols-4' : 'lg:grid-cols-4'} gap-6`}>
         <StatsCard 
           title="Total Projects" 
           value={stats?.totalProjects || 0} 
@@ -271,25 +308,17 @@ export default function Dashboard() {
           color={completionRate === 100 ? 'green' : 'amber'}
           description={`${12 - Math.round(completionRate / 100 * 12)} remaining parameters`}
         />
-        <div className="clay-card p-5 flex flex-col justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Public Endpoint</span>
-          <div className="text-xs font-medium text-text truncate select-all bg-surface p-2 rounded-lg border border-border my-2">
-            {`${window.location.origin}/portfolio-view/${profile?._id || user?.id || ''}`}
-          </div>
-          <span 
-            className="text-[10px] text-primary font-bold hover:underline cursor-pointer flex items-center gap-1 self-start"
-            onClick={() => {
-              navigator.clipboard.writeText(`${window.location.origin}/portfolio-view/${profile?._id || user?.id || ''}`);
-              alert('Public portfolio link copied to clipboard!');
-            }}
-          >
-            Copy link
-          </span>
-        </div>
+        <StatsCard 
+          title="User Logins" 
+          value={stats?.userStats?.loginCount || 1} 
+          icon={Clock} 
+          color="green"
+          description={`Registered ${stats?.userStats?.registrationDate ? new Date(stats.userStats.registrationDate).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : 'recently'}`}
+        />
       </div>
 
       {/* Charts / Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className={`grid grid-cols-1 ${showPreview ? 'xl:grid-cols-3' : 'lg:grid-cols-3'} gap-8`}>
         
         {/* Category breakdown (Donut) */}
         <div className="clay-card p-6 flex flex-col justify-between min-h-[300px]">
@@ -301,14 +330,14 @@ export default function Dashboard() {
             <p className="text-xs text-text-muted mb-6">Distribution of cataloged projects</p>
           </div>
           {stats?.categoryCounts ? (
-            <SVGDonutChart data={stats.categoryCounts} />
+            <SVGDonutChart data={stats.categoryCounts} showPreview={showPreview} />
           ) : (
             <div className="text-center text-text-muted text-sm py-8">No project category data</div>
           )}
         </div>
 
         {/* Top Technologies (Horizontal Bar) */}
-        <div className="clay-card p-6 flex flex-col justify-between min-h-[300px] lg:col-span-2">
+        <div className={`clay-card p-6 flex flex-col justify-between min-h-[300px] ${showPreview ? 'xl:col-span-2' : 'lg:col-span-2'}`}>
           <div>
             <h3 className="text-base font-bold text-text mb-1 flex items-center gap-1.5">
               <Code className="h-4.5 w-4.5 text-secondary" />
@@ -346,10 +375,10 @@ export default function Dashboard() {
       </div>
 
       {/* Main Info Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className={`grid grid-cols-1 ${showPreview ? 'xl:grid-cols-3' : 'lg:grid-cols-3'} gap-8`}>
         
         {/* Main Info Column */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className={showPreview ? 'xl:col-span-2 space-y-8' : 'lg:col-span-2 space-y-8'}>
           
           {/* Profile Preview Card */}
           <div className="clay-card p-6">
@@ -378,7 +407,7 @@ export default function Dashboard() {
             )}
 
             {/* Contact / Location Meta */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-text-muted pt-2 border-t border-border/60">
+            <div className={`grid grid-cols-1 ${showPreview ? 'xl:grid-cols-2' : 'sm:grid-cols-2'} gap-4 text-xs text-text-muted pt-2 border-t border-border/60`}>
               {profile?.location && (
                 <div className="flex items-center gap-2.5">
                   <MapPin className="h-4 w-4 text-text-muted/60" />
@@ -436,6 +465,46 @@ export default function Dashboard() {
                 <Link to="/dashboard/projects" className="inline-flex items-center gap-1.5 text-xs text-white bg-primary px-3 py-1.5 rounded-lg font-medium hover:bg-primary-dark shadow-sm">
                   <Plus className="h-3.5 w-3.5" /> Add Project
                 </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Recent Activity Timeline */}
+          <div className="clay-card p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-base font-bold text-text flex items-center gap-2">
+                  <History className="h-5 w-5 text-primary" />
+                  Recent Activities
+                </h3>
+                <p className="text-xs text-text-muted mt-0.5">Timeline of operations performed on your database</p>
+              </div>
+            </div>
+
+            {stats?.recentActivities && stats.recentActivities.length > 0 ? (
+              <div className="space-y-6 relative before:absolute before:inset-y-1 before:left-[11px] before:w-0.5 before:bg-border/60">
+                {stats.recentActivities.map((act) => (
+                  <div key={act._id} className="flex gap-4 relative">
+                    <div className="h-6 w-6 rounded-full bg-surface border border-border flex items-center justify-center shrink-0 z-10 text-primary bg-slate-900">
+                      <Clock className="h-3 w-3" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-bold text-primary block leading-none">
+                        {act.action}
+                      </span>
+                      <span className="text-sm font-semibold text-text block mt-1">
+                        {act.details}
+                      </span>
+                      <span className="text-[10px] text-text-muted block mt-0.5">
+                        {formatRelativeTime(act.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-text-muted text-sm py-8">
+                No recent activity records found.
               </div>
             )}
           </div>

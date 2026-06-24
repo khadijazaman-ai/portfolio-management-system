@@ -1,27 +1,29 @@
-# 🚀 MERN Portfolio Hub — Portfolio Management Dashboard
+# 🚀 MERN Portfolio Hub — Professional Portfolio CMS Dashboard
 
 [![MERN Stack](https://img.shields.io/badge/Stack-MERN-blue.svg)](https://mongodb.com)
 [![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20Tailwind-61dafb.svg)](https://react.dev)
 [![Express](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-green.svg)](https://expressjs.com)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
-[![Codiora Internship](https://img.shields.io/badge/Codiora%20Internship-Week%202-orange.svg)](https://codiora.com)
+[![Codiora Internship](https://img.shields.io/badge/Codiora%20Internship-Week%203-orange.svg)](https://codiora.com)
 
-An elegant, high-fidelity **Full Stack Portfolio Management Dashboard** built with the MERN stack (MongoDB, Express, React, Node.js), featuring a premium claymorphic UI design, animated background paths, JWT authentication, a comprehensive metrics/analytics dashboard, file upload system, and shareable public portfolio showcase views.
+An elegant, high-fidelity **Full Stack Portfolio CMS Dashboard** built with the MERN stack (MongoDB, Express, React, Node.js), featuring a premium claymorphic UI design, animated background paths, JWT authentication, a comprehensive metrics/analytics dashboard, profile and project image upload system, project category CRUD control, responsive live preview viewport simulator (desktop, tablet, mobile), and shareable public portfolio showcase views.
 
-Developed as part of the **Codiora Remote Internship Program — Week 2 Project** (Upgraded from Week 1).
+Developed as part of the **Codiora Remote Internship Program — Week 3 Project** (Upgraded from Week 2).
 
 ---
 
 ## 🌟 Key Features
 
-*   **📊 Workspace Dashboard & Analytics**: Displays live portfolio analytics (total projects, skills count, category distribution, and completed-to-planned project ratios) with interactive visual trackers.
+*   **📊 CMS Workspace Dashboard & Analytics**: Displays live portfolio analytics (total projects, skills count, category distribution, and completed-to-planned project ratios) with interactive visual trackers and recent operations log.
 *   **🔒 Secure JWT Authentication**: User registration and login forms with client-side field validation, password strength checking, and secure session management.
-*   **👤 Profile Management (with uploads)**: Rebuilt profile editor with distinct sections (Basic Info, Bio & Focus, Contact, Socials) and a **custom profile image file uploader** supporting file uploads up to **4MB** (converted to Base64 data URIs).
+*   **👤 Profile & Project Image Uploads**: Profile editor and project forms with custom image file uploaders supporting file uploads up to **4MB** (converted to Base64 data URIs) with client-side Canvas-based image compression.
+*   **📁 Custom Categories Management**: Create, edit, and delete custom project categories. Safely re-assigns project relations to "Uncategorized" upon category removal to prevent orphan records.
+*   **💻 Interactive Live Preview Simulator**: Side-by-side dashboard layout with drag-resize split divider. Toggles high-fidelity virtual viewports (Mobile with Dynamic Island, Tablet, and Desktop inside a monitor stand mockup) featuring real-time state sync and adjustable zoom sliders (50%-150%).
 *   **⚡ Skills CRUD Control**: Complete interactive panel to Add, Edit, and Delete technical skills, utilizing a 0-100 proficiency progress slider and skill categorization.
 *   **📁 Project Showcase Manager (CRUD & Filters)**: Comprehensive project cataloger supporting Add, Edit, and Delete actions, dynamic tag-chip inputs, and category assignments (Web Development, Mobile Development, AI/ML, etc.).
-*   **🔍 Advanced Search & Filter**: Interactive filter tabs (All, Category type) and real-time debounced project search to locate specific project showcase items instantly.
+*   **🔍 Advanced Search & Filter**: Real-time debounced project search (by title or technology) alongside category and project status filter dropdowns.
 *   **🔗 Shareable Public URL**: Generates a dedicated, guest-accessible showcase profile view (`/portfolio-view/:userId`) that automatically groups your skills, lists projects, and highlights professional recommendations.
-*   **🎨 Tactile Claymorphism UI**: Upgraded the design layout from basic glassmorphism to premium 3D claymorphic panels (`.clay-card`, `.clay-btn`, `.clay-badge`) with micro-animations, theme-adaptive styling, and glowing borders.
+*   **🎨 Tactile Claymorphism UI & Autoscale Layouts**: High-fidelity 3D claymorphic panels with micro-animations, theme-adaptive styling, and glowing borders. Dashboard cards, charts, and lists dynamically reflow columns and resize text when the preview pane is active.
 *   **✨ Animated SVG Background Paths**: Integrates dynamic glowing wave paths (`FloatingPaths`) that glide smoothly behind forms and workspace dashboards, accelerating to a lively pace for optimal visibility.
 *   **💎 100% Vector Icons**: Free of emojis and AI-generated image assets, utilizing clean, responsive SVG vector icons (`lucide-react`) and real, professional Unsplash recommendation portraits.
 
@@ -146,7 +148,9 @@ npm run dev
 
 ## 💡 Scoring Criteria Met
 
-1.  **High-Fidelity Animations**: Integrated Framer Motion page entrance transitions and snappy animated vector drawing paths.
-2.  **Claymorphic Design**: Overhauled all dashboard panels to use professional 3D claymorphic boxes and buttons with light/dark adaptive variables.
-3.  **Base64 Uploader & Parser Limits**: Scaled Express body-parser limit to 50MB to successfully process file uploads up to 4MB directly to the database.
-4.  **Auto Database Seeding**: Pre-seeded newly registered users with professional template skills and projects to display a ready-made profile instantly.
+1.  **Full Stack CMS Integration**: Clean synchronization of client state using React context, routers, and REST APIs with a Node/Express backend and local file-based seeding/persistence.
+2.  **Claymorphic Design & Adaptability**: Sleek, theme-adaptive 3D claymorphic UI elements that dynamically autoscale text and reflow stats cards/SVG donut charts.
+3.  **Client-Side Image Compression**: Image inputs that utilize Canvas scaling to reduce base64 payloads to <1MB before transmission, respecting the backend's 50MB limits.
+4.  **Database Relational Safeguards**: Category deletions gracefully decouple project models, moving them to a default "Uncategorized" state automatically.
+5.  **Multi-Viewport Live Simulator**: Centered device frame mocks (Dynamic Island mobile, tablet, and desktop monitors) with adjustable range zooms (50%-150%) and drag-resizable panes.
+6.  **Debounced Advanced Searches**: Text-based searches debounced at 300ms, filtering project logs by titles, tags, status, and categories simultaneously.

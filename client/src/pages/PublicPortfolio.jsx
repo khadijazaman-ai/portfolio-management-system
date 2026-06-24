@@ -22,18 +22,28 @@ import {
   Moon,
   ExternalLink,
   ChevronUp,
-  UserCheck
+  UserCheck,
+  Search,
+  X
 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { API_URL } from '../config';
 
 // Custom Animated Progress Bar Component
-function AnimatedSkillBar({ name, proficiency, level }) {
+function AnimatedSkillBar({ name, proficiency, level, onClick, isSelected }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <div ref={ref} className="space-y-1.5 p-4 rounded-2xl clay-badge">
+    <div 
+      ref={ref} 
+      onClick={onClick}
+      className={`space-y-1.5 p-4 rounded-2xl cursor-pointer transition-all duration-200 select-none ${
+        isSelected 
+          ? 'bg-primary/10 border-2 border-primary/50 shadow-md scale-[1.02]' 
+          : 'clay-badge border border-transparent hover:border-border hover:bg-surface/40'
+      }`}
+    >
       <div className="flex justify-between text-xs font-semibold">
         <span className="text-text">{name}</span>
         <span className="text-text-muted">{proficiency}% ({level})</span>
@@ -123,6 +133,8 @@ export default function PublicPortfolio() {
   // Active section state for navbar
   const [activeSection, setActiveSection] = useState('home');
   const [projectFilter, setProjectFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSkill, setSelectedSkill] = useState(null);
   
   // Theme state
   const [theme, setTheme] = useState(() => {
@@ -160,6 +172,27 @@ export default function PublicPortfolio() {
 
     fetchPublicData();
   }, [userId]);
+
+  // Real-time Editor Preview Listener
+  useEffect(() => {
+    const handlePreviewMessage = (event) => {
+      if (event.data && event.data.type === 'PREVIEW_PROFILE_UPDATE') {
+        setData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              ...event.data.data
+            }
+          };
+        });
+      }
+    };
+
+    window.addEventListener('message', handlePreviewMessage);
+    return () => window.removeEventListener('message', handlePreviewMessage);
+  }, []);
 
   // Set up Section Observer for Nav Highlight
   useEffect(() => {
@@ -276,9 +309,24 @@ export default function PublicPortfolio() {
     return Array.from(list);
   };
 
-  const filteredProjects = projectFilter === 'All'
-    ? projects
-    : projects.filter(p => p.category === projectFilter);
+  const filteredProjects = projects.filter(p => {
+    if (projectFilter !== 'All' && p.category !== projectFilter) {
+      return false;
+    }
+    if (selectedSkill && (!p.technologies || !p.technologies.some(t => t.toLowerCase() === selectedSkill.toLowerCase()))) {
+      return false;
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const titleMatch = p.title?.toLowerCase().includes(q);
+      const descMatch = p.description?.toLowerCase().includes(q);
+      const techMatch = p.technologies?.some(t => t.toLowerCase().includes(q));
+      if (!titleMatch && !descMatch && !techMatch) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-bg text-text relative pb-20 selection:bg-primary/30">
@@ -344,7 +392,7 @@ export default function PublicPortfolio() {
       </header>
 
       {/* Main Grid */}
-      <div className="max-w-6xl mx-auto px-4 mt-8 space-y-20">
+      <div className="max-w-6xl mx-auto px-4 mt-8 space-y-20 relative z-10">
         
         {/* 1. HERO / WELCOME SECTION */}
         <section id="home" className="pt-8">
@@ -427,7 +475,7 @@ export default function PublicPortfolio() {
 
         {/* 2. ABOUT ME SECTION */}
         <section id="about" className="space-y-8 scroll-mt-20">
-          <ScrollReveal>
+          
             <div className="border-l-4 border-primary pl-4">
               <h2 className="text-2xl font-extrabold text-text flex items-center gap-2 tracking-tight">
                 <UserCheck className="h-6 w-6 text-primary" />
@@ -435,7 +483,7 @@ export default function PublicPortfolio() {
               </h2>
               <p className="text-text-muted text-xs mt-0.5">Academic details and career aspirations</p>
             </div>
-          </ScrollReveal>
+          
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Bio Card */}
@@ -503,7 +551,7 @@ export default function PublicPortfolio() {
 
         {/* 3. SKILLS SECTION */}
         <section id="skills" className="space-y-8 scroll-mt-20">
-          <ScrollReveal>
+          
             <div className="border-l-4 border-secondary pl-4">
               <h2 className="text-2xl font-extrabold text-text flex items-center gap-2 tracking-tight">
                 <Cpu className="h-6 w-6 text-secondary" />
@@ -511,7 +559,7 @@ export default function PublicPortfolio() {
               </h2>
               <p className="text-text-muted text-xs mt-0.5">My engineering stack organized by category</p>
             </div>
-          </ScrollReveal>
+          
 
           {Object.keys(groupedSkills).length > 0 ? (
             <div className="space-y-8">
@@ -528,6 +576,8 @@ export default function PublicPortfolio() {
                         name={skill.name}
                         proficiency={skill.proficiency !== undefined ? skill.proficiency : (skill.level === 'Advanced' ? 90 : skill.level === 'Intermediate' ? 65 : 30)}
                         level={skill.level || 'Intermediate'}
+                        onClick={() => setSelectedSkill(prev => prev === skill.name ? null : skill.name)}
+                        isSelected={selectedSkill === skill.name}
                       />
                     ))}
                   </div>
@@ -543,7 +593,7 @@ export default function PublicPortfolio() {
 
         {/* 4. PROJECTS SECTION */}
         <section id="projects" className="space-y-8 scroll-mt-20">
-          <ScrollReveal>
+          
             <div className="border-l-4 border-primary pl-4">
               <h2 className="text-2xl font-extrabold text-text flex items-center gap-2 tracking-tight">
                 <Layers className="h-6 w-6 text-primary" />
@@ -551,10 +601,43 @@ export default function PublicPortfolio() {
               </h2>
               <p className="text-text-muted text-xs mt-0.5">Browse my projects and live applications</p>
             </div>
-          </ScrollReveal>
+          
 
           {projects.length > 0 ? (
             <div className="space-y-6">
+              {/* Search & Active Filters Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                {/* Search Input */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-muted">
+                    <Search className="h-4 w-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search projects by title, stack..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-xs text-text transition-all"
+                  />
+                </div>
+
+                {/* Active Skill Filter Badge */}
+                {selectedSkill && (
+                  <div className="flex items-center gap-2 self-stretch sm:justify-end">
+                    <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">Active Competency:</span>
+                    <span className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary text-xs font-bold px-3 py-1 rounded-xl">
+                      {selectedSkill}
+                      <button 
+                        onClick={() => setSelectedSkill(null)}
+                        className="hover:text-danger cursor-pointer font-bold shrink-0"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  </div>
+                )}
+              </div>
+
               {/* Project Category Filter Tabs */}
               <div className="flex flex-wrap gap-1.5 pb-2 border-b border-border">
                 {getProjectCategories().map((cat) => (
@@ -574,15 +657,31 @@ export default function PublicPortfolio() {
               </div>
 
               {/* Projects Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProjects.map((project) => (
-                  <ProjectCard
-                    key={project._id}
-                    project={project}
-                    isReadOnly={true}
-                  />
-                ))}
-              </div>
+              {filteredProjects.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProjects.map((project) => (
+                    <ProjectCard
+                      key={project._id}
+                      project={project}
+                      isReadOnly={true}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="p-12 rounded-2xl bg-surface/20 border border-dashed border-border text-center">
+                  <p className="text-text-muted italic text-sm">No projects match the selected filters or search query.</p>
+                  <button 
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedSkill(null);
+                      setProjectFilter('All');
+                    }}
+                    className="mt-3 text-xs text-primary font-bold hover:underline cursor-pointer"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="p-10 rounded-2xl bg-surface/20 border border-dashed border-border text-center">
@@ -593,7 +692,7 @@ export default function PublicPortfolio() {
 
         {/* 5. TESTIMONIALS SECTION */}
         <section id="testimonials" className="space-y-8 scroll-mt-20">
-          <ScrollReveal>
+          
             <div className="border-l-4 border-secondary pl-4">
               <h2 className="text-2xl font-extrabold text-text flex items-center gap-2 tracking-tight">
                 <MessageSquare className="h-6 w-6 text-secondary" />
@@ -601,7 +700,7 @@ export default function PublicPortfolio() {
               </h2>
               <p className="text-text-muted text-xs mt-0.5">What mentors and peers say about my work</p>
             </div>
-          </ScrollReveal>
+          
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((test, idx) => (
@@ -630,7 +729,7 @@ export default function PublicPortfolio() {
 
         {/* 6. CONTACT SECTION */}
         <section id="contact" className="space-y-8 scroll-mt-20 pb-8">
-          <ScrollReveal>
+          
             <div className="border-l-4 border-primary pl-4">
               <h2 className="text-2xl font-extrabold text-text flex items-center gap-2 tracking-tight">
                 <Mail className="h-6 w-6 text-primary" />
@@ -638,7 +737,7 @@ export default function PublicPortfolio() {
               </h2>
               <p className="text-text-muted text-xs mt-0.5">Let's discuss opportunities and collaborations</p>
             </div>
-          </ScrollReveal>
+          
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Contact details */}

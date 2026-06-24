@@ -56,6 +56,14 @@ router.post('/', auth, async (req, res) => {
     });
 
     await project.save();
+
+    const Activity = require('../models/Activity');
+    await new Activity({
+      user: req.user,
+      action: 'Created Project',
+      details: project.title
+    }).save();
+
     res.status(201).json(project);
   } catch (err) {
     console.error('Add project error:', err);
@@ -102,6 +110,13 @@ router.put('/:id', auth, async (req, res) => {
       { new: true, runValidators: true }
     );
 
+    const Activity = require('../models/Activity');
+    await new Activity({
+      user: req.user,
+      action: 'Updated Project',
+      details: project.title
+    }).save();
+
     res.json(project);
   } catch (err) {
     console.error('Update project error:', err);
@@ -120,6 +135,13 @@ router.delete('/:id', auth, async (req, res) => {
     if (project.user.toString() !== req.user) {
       return res.status(401).json({ message: 'Not authorized to delete this project' });
     }
+
+    const Activity = require('../models/Activity');
+    await new Activity({
+      user: req.user,
+      action: 'Deleted Project',
+      details: project.title
+    }).save();
 
     await Project.findByIdAndDelete(req.params.id);
     res.json({ message: 'Project deleted successfully' });

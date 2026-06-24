@@ -41,6 +41,14 @@ router.post('/', auth, async (req, res) => {
     });
 
     await skill.save();
+
+    const Activity = require('../models/Activity');
+    await new Activity({
+      user: req.user,
+      action: 'Created Skill',
+      details: skill.name
+    }).save();
+
     res.status(201).json(skill);
   } catch (err) {
     console.error('Add skill error:', err);
@@ -82,6 +90,13 @@ router.put('/:id', auth, async (req, res) => {
       { new: true, runValidators: true }
     );
 
+    const Activity = require('../models/Activity');
+    await new Activity({
+      user: req.user,
+      action: 'Updated Skill',
+      details: skill.name
+    }).save();
+
     res.json(skill);
   } catch (err) {
     console.error('Update skill error:', err);
@@ -101,6 +116,13 @@ router.delete('/:id', auth, async (req, res) => {
     if (skill.user.toString() !== req.user) {
       return res.status(401).json({ message: 'Not authorized to delete this skill' });
     }
+
+    const Activity = require('../models/Activity');
+    await new Activity({
+      user: req.user,
+      action: 'Deleted Skill',
+      details: skill.name
+    }).save();
 
     await Skill.findByIdAndDelete(req.params.id);
     res.json({ message: 'Skill deleted successfully' });
