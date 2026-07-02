@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../config';
+import { loginUser } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, LogIn, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -39,8 +38,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, form);
-      login(res.data.user, res.data.token);
+      const data = await loginUser(form);
+      login(data.user, data.token);
       navigate('/dashboard');
     } catch (err) {
       console.error(err);

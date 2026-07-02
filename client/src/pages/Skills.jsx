@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../config';
+import { getSkills, createSkill, updateSkill, deleteSkill } from '../api/skillApi';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -18,9 +17,8 @@ import {
 } from 'lucide-react';
 
 export default function Skills() {
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const headers = { Authorization: `Bearer ${token}` };
 
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,8 +48,8 @@ export default function Skills() {
   const fetchSkills = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/api/skills`, { headers });
-      setSkills(res.data);
+      const data = await getSkills();
+      setSkills(data);
     } catch (err) {
       console.error(err);
       if (err.response?.status === 401) {
@@ -88,10 +86,10 @@ export default function Skills() {
       };
 
       if (editId) {
-        await axios.put(`${API_URL}/api/skills/${editId}`, payload, { headers });
+        await updateSkill(editId, payload);
         setSuccess('Skill updated successfully!');
       } else {
-        await axios.post(`${API_URL}/api/skills`, payload, { headers });
+        await createSkill(payload);
         setSuccess('Skill added successfully!');
       }
       
@@ -121,7 +119,7 @@ export default function Skills() {
     setError('');
     setSuccess('');
     try {
-      await axios.delete(`${API_URL}/api/skills/${id}`, { headers });
+      await deleteSkill(id);
       setSuccess('Skill deleted successfully!');
       fetchSkills();
     } catch (err) {

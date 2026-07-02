@@ -15,10 +15,12 @@ import {
   Briefcase,
   Layers,
   Eye,
-  EyeOff
+  EyeOff,
+  KeyRound
 } from 'lucide-react';
 import FloatingPaths from './FloatingPaths';
 import PreviewFrame from './PreviewFrame';
+import { getNotifications, markNotificationsRead, markSingleNotificationRead } from '../api/dashboardApi';
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
@@ -34,10 +36,49 @@ export default function DashboardLayout() {
     return parseInt(localStorage.getItem('previewWidth')) || 480;
   });
   const [isResizing, setIsResizing] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
 
   const startResizing = (e) => {
     e.preventDefault();
     setIsResizing(true);
+  };
+
+  const fetchNotifs = async () => {
+    try {
+      const data = await getNotifications();
+      setNotifications(data);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifs();
+      const interval = setInterval(fetchNotifs, 20000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markNotificationsRead();
+      setNotifications(notifications.map(n => ({ ...n, read: true })));
+    } catch (err) {
+      console.error('Error marking notifications as read:', err);
+    }
+  };
+
+  const handleMarkSingleRead = async (id) => {
+    try {
+      await markSingleNotificationRead(id);
+      setNotifications(notifications.map(n => n._id === id ? { ...n, read: true } : n));
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
   };
 
   useEffect(() => {
@@ -91,6 +132,7 @@ export default function DashboardLayout() {
     { label: 'Categories', path: '/dashboard/categories', icon: Layers },
     { label: 'Skills', path: '/dashboard/skills', icon: Cpu },
     { label: 'Projects', path: '/dashboard/projects', icon: FolderGit2 },
+    { label: 'Change Password', path: '/dashboard/change-password', icon: KeyRound },
   ];
 
   const getPageTitle = () => {
@@ -234,7 +276,7 @@ export default function DashboardLayout() {
       <div className="flex-1 flex flex-col min-w-0 h-screen relative overflow-hidden">
         <FloatingPaths />
         {/* Topbar */}
-        <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 sticky top-0 backdrop-blur-md bg-surface/90">
+        <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-4 sm:px-6 z-25 shrink-0 sticky top-0 backdrop-blur-md bg-surface/90">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -280,11 +322,67 @@ export default function DashboardLayout() {
               {theme === 'dark' ? <Sun className="h-4.5 w-4.5 text-warning" /> : <Moon className="h-4.5 w-4.5 text-secondary" />}
             </button>
 
-            {/* Notifications (Static Badge) */}
-            <button className="p-2 rounded-xl border border-border hover:bg-bg text-text-muted hover:text-text relative transition-all">
-              <Bell className="h-4.5 w-4.5" />
-              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-danger"></span>
-            </button>
+            {/* Notifications Dropdown Panel */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifPanel(!showNotifPanel)}
+                className="p-2 rounded-xl border border-border hover:bg-bg text-text-muted hover:text-text relative transition-all cursor-pointer"
+                title="Notifications"
+              >
+                <Bell className="h-4.5 w-4.5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-danger text-white text-[9px] font-bold shadow-md animate-bounce">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {showNotifPanel && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowNotifPanel(false)}></div>
+                  <div className="absolute right-0 mt-2.5 w-80 bg-surface border border-border rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in">
+                    <div className="p-4 border-b border-border flex items-center justify-between bg-bg/40">
+                      <span className="text-xs font-bold text-text">Workspace Alerts</span>
+                      {unreadCount > 0 && (
+                        <button 
+                          onClick={handleMarkAllRead}
+                          className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="max-h-64 overflow-y-auto divide-y divide-border/50">
+                      {notifications.length > 0 ? (
+                        notifications.map((notif) => (
+                          <div 
+                            key={notif._id} 
+                            onClick={() => {
+                              if (!notif.read) handleMarkSingleRead(notif._id);
+                            }}
+                            className={`p-3.5 transition-colors cursor-pointer text-left ${
+                              notif.read ? 'hover:bg-bg/40' : 'bg-primary/5 hover:bg-primary/10 border-l-2 border-primary'
+                            }`}
+                          >
+                            <p className="text-xs font-semibold text-text leading-relaxed">
+                              {notif.message}
+                            </p>
+                            <span className="text-[9px] text-text-muted mt-1 block">
+                              {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-8 text-center text-xs text-text-muted italic">
+                          No notifications found.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="h-6 w-px bg-border mx-1 hidden sm:block"></div>
 

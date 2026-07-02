@@ -1,5 +1,6 @@
 import { Edit, Trash2, Github, ExternalLink, Activity, CheckCircle2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { API_URL } from '../config';
 
 export default function ProjectCard({ project, onEdit, onDelete, isReadOnly = false }) {
   const status = project.status || 'Completed';
@@ -50,7 +51,7 @@ export default function ProjectCard({ project, onEdit, onDelete, isReadOnly = fa
         {project.imageUrl && (
           <div className="h-40 w-full overflow-hidden rounded-lg mb-4 bg-bg border border-border">
             <img 
-              src={project.imageUrl} 
+              src={project.imageUrl.startsWith('/uploads/') ? `${API_URL}${project.imageUrl}` : project.imageUrl} 
               alt={project.title} 
               className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
               onError={(e) => { e.target.style.display = 'none'; }}

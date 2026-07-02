@@ -5,9 +5,12 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Skills from './pages/Skills';
 import Projects from './pages/Projects';
+import AddProject from './pages/AddProject';
+import EditProject from './pages/EditProject';
 import Portfolio from './pages/Portfolio';
 import PublicPortfolio from './pages/PublicPortfolio';
 import Categories from './pages/Categories';
+import ChangePassword from './pages/ChangePassword';
 import DashboardLayout from './components/DashboardLayout';
 
 function PrivateRoute({ children }) {
@@ -45,6 +48,9 @@ function AppContent() {
           <Route path="categories" element={<Categories />} />
           <Route path="skills" element={<Skills />} />
           <Route path="projects" element={<Projects />} />
+          <Route path="projects/add" element={<AddProject />} />
+          <Route path="projects/edit/:id" element={<EditProject />} />
+          <Route path="change-password" element={<ChangePassword />} />
         </Route>
 
         {/* Fallback redirect */}

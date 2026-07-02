@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../config';
+import { registerUser } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
 import { User, Mail, Lock, UserPlus, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -43,12 +42,12 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}/api/auth/register`, {
+      const data = await registerUser({
         name: form.name,
         email: form.email,
         password: form.password
       });
-      login(res.data.user, res.data.token);
+      login(data.user, data.token);
       navigate('/dashboard');
     } catch (err) {
       console.error(err);

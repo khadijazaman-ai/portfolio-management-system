@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { 
+  getProfile, 
+  updateProfile, 
+  updateProfileAbout, 
+  updateProfileContact, 
+  updateProfileSocial, 
+  uploadProfileImage 
+} from '../api/profileApi';
 import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -24,9 +31,8 @@ import {
 import { motion } from 'framer-motion';
 
 export default function Portfolio() {
-  const { token, updateUser, logout } = useAuth();
+  const { updateUser, logout } = useAuth();
   const navigate = useNavigate();
-  const headers = { Authorization: `Bearer ${token}` };
 
   const [activeTab, setActiveTab] = useState('basic');
   const [profileImage, setProfileImage] = useState('');
@@ -51,38 +57,7 @@ export default function Portfolio() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const compressImage = (base64Str, maxWidth = 800, maxHeight = 600, quality = 0.7) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.src = base64Str;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = () => resolve(base64Str);
-    });
-  };
-
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     setError('');
     setSuccess('');
     const file = e.target.files[0];
@@ -93,29 +68,33 @@ export default function Portfolio() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const compressed = await compressImage(reader.result);
-        setProfileImage(compressed);
-        setSuccess('Image uploaded and compressed successfully! Save changes to apply.');
-      } catch (err) {
-        setProfileImage(reader.result);
-        setSuccess('Image uploaded successfully! Save changes to apply.');
-      }
-    };
-    reader.onerror = () => {
-      setError('Error reading file.');
-    };
-    reader.readAsDataURL(file);
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    setSubmitting(true);
+    try {
+      const data = await uploadProfileImage(formData);
+      
+      const fullUrl = data.imageUrl.startsWith('/uploads/') 
+        ? `${API_URL}${data.imageUrl}` 
+        : data.imageUrl;
+      
+      setProfileImage(fullUrl);
+      setSuccess('Profile picture updated successfully!');
+      updateUser({ profileImage: data.imageUrl });
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Failed to upload profile picture.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API_URL}/api/portfolio`, { headers });
-        const data = res.data;
+        const data = await getProfile();
         setForm({
           name: data.name || '',
           role: data.role || '',
@@ -131,20 +110,27 @@ export default function Portfolio() {
           github: data.github || '',
           website: data.website || ''
         });
-        setProfileImage(data.profileImage || '');
+        
+        if (data.profileImage) {
+          const fullUrl = data.profileImage.startsWith('/uploads/') 
+            ? `${API_URL}${data.profileImage}` 
+            : data.profileImage;
+          setProfileImage(fullUrl);
+        } else {
+          setProfileImage('');
+        }
       } catch (err) {
         console.error(err);
         if (err.response?.status === 401) {
           logout();
           navigate('/login');
         } else {
-          setError('Failed to retrieve profile information.');
+          setError('Failed to load portfolio.');
         }
       } finally {
         setLoading(false);
       }
     };
-
     fetchPortfolio();
   }, []);
 
@@ -185,8 +171,7 @@ export default function Portfolio() {
     setSubmitting(true);
 
     try {
-      let endpoint = `${API_URL}/api/profile`;
-      let payload = {};
+      let data;
 
       if (section === 'basic') {
         if (!form.name.trim()) {
@@ -194,45 +179,43 @@ export default function Portfolio() {
           setSubmitting(false);
           return;
         }
-        payload = {
+        
+        let relativeImagePath = profileImage;
+        if (profileImage && profileImage.startsWith(API_URL)) {
+          relativeImagePath = profileImage.replace(API_URL, '');
+        }
+
+        data = await updateProfile({
           name: form.name,
           role: form.role,
           tagline: form.tagline,
-          profileImage: profileImage
-        };
+          profileImage: relativeImagePath
+        });
+        
+        updateUser({ name: data.name });
       } else if (section === 'about') {
-        endpoint = `${API_URL}/api/profile/about`;
-        payload = {
+        data = await updateProfileAbout({
           about: form.about,
           education: form.education,
           careerGoals: form.careerGoals,
           interests: form.interests
-        };
+        });
       } else if (section === 'contact') {
-        endpoint = `${API_URL}/api/profile/contact`;
-        payload = {
+        data = await updateProfileContact({
           email: form.email,
           phone: form.phone,
           location: form.location
-        };
+        });
       } else if (section === 'social') {
         if (!validateUrls(['linkedin', 'github', 'website'])) {
           setSubmitting(false);
           return;
         }
-        endpoint = `${API_URL}/api/profile/social`;
-        payload = {
+        data = await updateProfileSocial({
           linkedin: sanitizeUrl(form.linkedin),
           github: sanitizeUrl(form.github),
           website: sanitizeUrl(form.website)
-        };
-      }
-
-      const res = await axios.put(endpoint, payload, { headers });
-      
-      // Update local storage/context name if it was modified
-      if (section === 'basic') {
-        updateUser({ name: res.data.name });
+        });
       }
 
       setSuccess(`${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully!`);

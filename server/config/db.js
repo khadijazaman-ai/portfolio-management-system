@@ -246,6 +246,9 @@ const setupMockDBSystem = () => {
 
   class MockModel {
     constructor(data, collectionName) {
+      if (db) {
+        db[collectionName] = db[collectionName] || [];
+      }
       this._data = { ...(data || {}) };
       this._collectionName = collectionName;
       if (!this._data._id) this._data._id = generateId();
@@ -255,6 +258,9 @@ const setupMockDBSystem = () => {
     async save() {
       this._data.updatedAt = new Date();
       this._data.createdAt = this._data.createdAt || new Date();
+      if (db) {
+        db[this._collectionName] = db[this._collectionName] || [];
+      }
       const collection = db[this._collectionName];
       const idx = collection.findIndex(item => item._id.toString() === this._id.toString());
       if (idx !== -1) collection[idx] = this._data; else collection.push(this._data);
@@ -266,6 +272,9 @@ const setupMockDBSystem = () => {
   const createMockModelClass = (modelName, collectionName) => {
     const Class = class extends MockModel {
       constructor(data) {
+        if (db) {
+          db[collectionName] = db[collectionName] || [];
+        }
         super(data, collectionName);
         if (data) {
           Object.keys(data).forEach(key => {
@@ -282,6 +291,7 @@ const setupMockDBSystem = () => {
       }
 
       static find(query) {
+        if (db) db[collectionName] = db[collectionName] || [];
         return new MockQuery(async (selectFields) => {
           const results = db[collectionName];
           const filtered = results.filter(item => matchesQuery(item, cleanQuery(query)));
@@ -290,6 +300,7 @@ const setupMockDBSystem = () => {
       }
 
       static findOne(query) {
+        if (db) db[collectionName] = db[collectionName] || [];
         return new MockQuery(async (selectFields) => {
           const results = db[collectionName];
           const result = results.find(item => matchesQuery(item, cleanQuery(query)));
@@ -301,6 +312,7 @@ const setupMockDBSystem = () => {
       }
 
       static findById(id) {
+        if (db) db[collectionName] = db[collectionName] || [];
         return new MockQuery(async (selectFields) => {
           if (!id) return null;
           const result = db[collectionName].find(item => item._id.toString() === id.toString());
@@ -316,6 +328,7 @@ const setupMockDBSystem = () => {
       }
 
       static findByIdAndUpdate(id, update, options) {
+        if (db) db[collectionName] = db[collectionName] || [];
         return new MockQuery(async (selectFields) => {
           if (!id) return null;
           const resultIdx = db[collectionName].findIndex(item => item._id.toString() === id.toString());
@@ -332,6 +345,7 @@ const setupMockDBSystem = () => {
       }
 
       static findByIdAndDelete(id) {
+        if (db) db[collectionName] = db[collectionName] || [];
         return new MockQuery(async (selectFields) => {
           if (!id) return null;
           const resultIdx = db[collectionName].findIndex(item => item._id.toString() === id.toString());
@@ -343,6 +357,7 @@ const setupMockDBSystem = () => {
       }
 
       static updateMany(query, update) {
+        if (db) db[collectionName] = db[collectionName] || [];
         return new MockQuery(async () => {
           let collection = db[collectionName];
           let updates = update.$set || update;
@@ -359,6 +374,15 @@ const setupMockDBSystem = () => {
           return { nModified: count };
         });
       }
+
+      static countDocuments(query) {
+        if (db) db[collectionName] = db[collectionName] || [];
+        return new MockQuery(async () => {
+          const results = db[collectionName];
+          const filtered = results.filter(item => matchesQuery(item, cleanQuery(query)));
+          return filtered.length;
+        });
+      }
     };
     return Class;
   };
@@ -368,7 +392,8 @@ const setupMockDBSystem = () => {
     Skill: createMockModelClass('Skill', 'skills'),
     Project: createMockModelClass('Project', 'projects'),
     Category: createMockModelClass('Category', 'categories'),
-    Activity: createMockModelClass('Activity', 'activities')
+    Activity: createMockModelClass('Activity', 'activities'),
+    Notification: createMockModelClass('Notification', 'notifications')
   };
 
   mongoose.connect = async () => {

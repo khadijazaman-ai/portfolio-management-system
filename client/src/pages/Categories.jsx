@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../config';
+import { getCategories, createCategory, updateCategory, deleteCategory } from '../api/projectApi';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -18,9 +17,8 @@ import {
 } from 'lucide-react';
 
 export default function Categories() {
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const headers = { Authorization: `Bearer ${token}` };
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,8 +35,8 @@ export default function Categories() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/api/categories`, { headers });
-      setCategories(res.data);
+      const data = await getCategories();
+      setCategories(data);
     } catch (err) {
       console.error(err);
       if (err.response?.status === 401) {
@@ -71,10 +69,10 @@ export default function Categories() {
       const payload = { name: name.trim() };
 
       if (editId) {
-        await axios.put(`${API_URL}/api/categories/${editId}`, payload, { headers });
+        await updateCategory(editId, payload);
         setSuccess('Category updated successfully!');
       } else {
-        await axios.post(`${API_URL}/api/categories`, payload, { headers });
+        await createCategory(payload);
         setSuccess('Category created successfully!');
       }
       
@@ -92,8 +90,8 @@ export default function Categories() {
     setError('');
     setSuccess('');
     try {
-      const res = await axios.delete(`${API_URL}/api/categories/${id}`, { headers });
-      setSuccess(res.data.message || 'Category deleted successfully.');
+      const res = await deleteCategory(id);
+      setSuccess(res.message || 'Category deleted successfully.');
       setShowConfirmDelete(null);
       fetchCategories();
     } catch (err) {

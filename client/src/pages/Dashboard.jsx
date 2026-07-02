@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useOutletContext } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../config';
+import { getProfile, seedProfileData } from '../api/profileApi';
+import { getStats } from '../api/dashboardApi';
+import { getSkills } from '../api/skillApi';
+import { getProjects } from '../api/projectApi';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import StatsCard from '../components/StatsCard';
@@ -123,17 +125,17 @@ export default function Dashboard() {
   const fetchDashboardData = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true);
-      const [profileRes, statsRes, skillsRes, projectsRes] = await Promise.all([
-        axios.get(`${API_URL}/api/portfolio`, { headers }),
-        axios.get(`${API_URL}/api/dashboard/stats`, { headers }),
-        axios.get(`${API_URL}/api/skills`, { headers }),
-        axios.get(`${API_URL}/api/projects`, { headers })
+      const [profileData, statsData, skillsData, projectsData] = await Promise.all([
+        getProfile(),
+        getStats(),
+        getSkills(),
+        getProjects()
       ]);
       
-      setProfile(profileRes.data);
-      setStats(statsRes.data);
-      setSkills(skillsRes.data);
-      setProjects(projectsRes.data);
+      setProfile(profileData);
+      setStats(statsData);
+      setSkills(skillsData);
+      setProjects(projectsData);
     } catch (err) {
       console.error(err);
       if (err.response?.status === 401) {
@@ -155,7 +157,7 @@ export default function Dashboard() {
     try {
       setSeeding(true);
       setError('');
-      await axios.post(`${API_URL}/api/profile/seed`, {}, { headers });
+      await seedProfileData();
       await fetchDashboardData(false);
       alert('Portfolio demo data seeded successfully!');
     } catch (err) {

@@ -124,8 +124,192 @@ function FloatingPaths({ position }) {
   );
 }
 
+// Interactive Developer Terminal Component
+function DeveloperTerminal({ user, skills, projects }) {
+  const [input, setInput] = useState('');
+  const [history, setHistory] = useState([
+    { type: 'input', text: 'welcome' },
+    { type: 'output', text: 'Initializing Khadija OS v4.0.0...\nConnection: SECURE\nType "help" or click badges below to explore my workspace.' }
+  ]);
+  const terminalEndRef = useRef(null);
+
+  useEffect(() => {
+    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [history]);
+
+  const handleCommand = (cmdText) => {
+    const trimmed = cmdText.trim().toLowerCase();
+    if (!trimmed) return;
+
+    let reply = '';
+    switch (trimmed) {
+      case 'help':
+        reply = 'Available commands:\n  about    - Show professional bio, location & website\n  skills   - List technical competencies by category\n  projects - Show published software products\n  contact  - Show social channels & email credentials\n  clear    - Clear terminal shell';
+        break;
+      case 'about':
+        reply = `Biography:\n${user.about || 'Senior AI & Full-Stack Developer'}\n\nLocation: ${user.location || 'N/A'}\nEducation: ${user.education || 'N/A'}\nGoals: ${user.careerGoals || 'N/A'}`;
+        break;
+      case 'skills':
+        const names = skills && skills.length > 0
+          ? skills.map(s => `• ${s.name} (${s.level || 'Intermediate'} - ${s.proficiency}%)`).join('\n')
+          : 'No technical skills registered.';
+        reply = `Technical Stack:\n${names}`;
+        break;
+      case 'projects':
+        const titles = projects && projects.length > 0
+          ? projects.map(p => `• [${p.status || 'Completed'}] ${p.title} - ${p.description.slice(0, 70)}...`).join('\n')
+          : 'No projects registered.';
+        reply = `Featured Work:\n${titles}`;
+        break;
+      case 'contact':
+        reply = `Get In Touch:\n  Email: ${user.email}\n  GitHub: ${user.github || 'N/A'}\n  LinkedIn: ${user.linkedin || 'N/A'}\n  Website: ${user.website || 'N/A'}`;
+        break;
+      case 'clear':
+        setHistory([]);
+        setInput('');
+        return;
+      default:
+        reply = `Command "${trimmed}" not recognized. Type "help" for a list of valid commands.`;
+    }
+
+    setHistory(prev => [...prev, { type: 'input', text: cmdText }, { type: 'output', text: reply }]);
+    setInput('');
+  };
+
+  return (
+    <div className="w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 text-green-400 text-xs font-mono shadow-2xl flex flex-col h-72 terminal-window">
+      {/* Top Header Bar */}
+      <div className="bg-slate-950 px-4 py-2.5 flex items-center justify-between border-b border-slate-900 select-none shrink-0">
+        <div className="flex gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-danger/80"></span>
+          <span className="h-3 w-3 rounded-full bg-warning/80"></span>
+          <span className="h-3 w-3 rounded-full bg-success/80"></span>
+        </div>
+        <span className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">khadija@developer-os:~</span>
+        <div className="w-8"></div>
+      </div>
+
+      {/* Terminal Display Logs */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-2.5 scrollbar-thin select-text">
+        {history.map((h, i) => (
+          <div key={i} className="whitespace-pre-wrap leading-relaxed">
+            {h.type === 'input' ? (
+              <div className="flex items-center gap-1.5">
+                <span className="text-primary font-bold">khadija$</span>
+                <span className="text-white">{h.text}</span>
+              </div>
+            ) : (
+              <div className="text-slate-300 pl-4">{h.text}</div>
+            )}
+          </div>
+        ))}
+        <div ref={terminalEndRef} />
+      </div>
+
+      {/* Inputs Bar */}
+      <div className="bg-slate-950/50 p-2.5 border-t border-slate-900/60 flex flex-col sm:flex-row items-center gap-2.5 select-none shrink-0">
+        <form 
+          onSubmit={(e) => { e.preventDefault(); handleCommand(input); }} 
+          className="flex items-center gap-1.5 w-full bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-850 focus-within:border-primary/50"
+        >
+          <span className="text-primary font-bold">khadija$</span>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type a command (e.g. help, skills)..."
+            className="bg-transparent border-none outline-none text-white w-full text-xs font-mono"
+          />
+          <button type="submit" className="hidden" />
+        </form>
+        {/* Quick Click badging */}
+        <div className="flex gap-1.5 flex-wrap">
+          {['about', 'skills', 'projects', 'contact', 'clear'].map(c => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => handleCommand(c)}
+              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px] transition-colors cursor-pointer border border-slate-700"
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Testimonial Carousel Component
+function TestimonialCarousel({ testimonials }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex(prev => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [testimonials]);
+
+  const current = testimonials[index];
+
+  return (
+    <div className="relative overflow-hidden w-full py-2">
+      <div className="clay-card p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 justify-between relative min-h-[220px]">
+        {/* Left quote decoration */}
+        <div className="absolute top-4 left-6 text-7xl font-serif text-primary/10 select-none pointer-events-none">“</div>
+        <div className="absolute bottom-4 right-8 text-7xl font-serif text-secondary/10 select-none pointer-events-none">”</div>
+
+        <motion.div 
+          key={index}
+          initial={{ opacity: 0, x: 25 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -25 }}
+          transition={{ duration: 0.45 }}
+          className="space-y-4 md:col-span-2 relative z-10 flex-1"
+        >
+          <p className="text-text-muted text-sm md:text-base leading-relaxed italic font-medium">
+            "{current.quote}"
+          </p>
+          <div className="flex items-center gap-3 pt-4 border-t border-border/40">
+            <img 
+              src={current.avatar} 
+              alt={current.name} 
+              className="h-11 w-11 rounded-full object-cover border-2 border-primary/20 shadow-md"
+            />
+            <div>
+              <h4 className="text-xs md:text-sm font-extrabold text-text leading-none">{current.name}</h4>
+              <span className="text-[10px] md:text-xs text-text-muted font-semibold block mt-1">{current.role}</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Carousel indicators/nav */}
+        <div className="flex md:flex-col gap-2 justify-center shrink-0 z-10">
+          {testimonials.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setIndex(idx)}
+              className={`h-2.5 w-2.5 rounded-full transition-all cursor-pointer ${
+                index === idx ? 'bg-primary scale-125' : 'bg-border/60 hover:bg-border'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PublicPortfolio() {
   const { userId } = useParams();
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -396,79 +580,102 @@ export default function PublicPortfolio() {
         
         {/* 1. HERO / WELCOME SECTION */}
         <section id="home" className="pt-8">
-          <div className="clay-card p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+          <div 
+            onMouseMove={handleMouseMove}
+            className="clay-card spotlight-card p-8 md:p-12 flex flex-col gap-8 relative overflow-hidden"
+          >
             {/* Background elements */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl -ml-20 -mb-20"></div>
+            <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
 
-            <div className="space-y-6 max-w-2xl text-center md:text-left z-10">
-              {/* Header role */}
-              {user.role && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-3.5 py-1 rounded-full">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  {user.role}
-                </span>
-              )}
-              
-              <h1 className="text-4xl md:text-5xl font-extrabold text-text tracking-tight leading-tight">
-                {user.name}
-              </h1>
+            {/* Profile Row */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 w-full z-10">
+              <div className="space-y-6 max-w-2xl text-center md:text-left">
+                {/* Header role */}
+                {user.role && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-3.5 py-1 rounded-full">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    {user.role}
+                  </span>
+                )}
+                
+                <h1 className="text-4xl md:text-5xl font-extrabold text-text tracking-tight leading-tight">
+                  {user.name}
+                </h1>
 
-              {user.tagline && (
-                <p className="text-lg font-medium text-text-muted/95 leading-relaxed">
-                  {user.tagline}
-                </p>
-              )}
+                {user.tagline && (
+                  <p className="text-lg font-medium text-text-muted/95 leading-relaxed">
+                    {user.tagline}
+                  </p>
+                )}
 
-              {/* Quick links */}
-              <div className="flex flex-wrap gap-3 pt-2 justify-center md:justify-start">
-                {user.github && (
-                  <a 
-                    href={user.github} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-slate-900 dark:bg-slate-950 hover:bg-slate-800 dark:hover:bg-slate-800 text-white border border-slate-800 dark:border-slate-900 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <Github className="h-4 w-4 text-white" />
-                    GitHub
-                  </a>
-                )}
-                {user.linkedin && (
-                  <a 
-                    href={user.linkedin} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-[#0A66C2] hover:bg-[#004182] text-white border border-[#0A66C2] shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <Linkedin className="h-4 w-4 text-white" />
-                    LinkedIn
-                  </a>
-                )}
-                {user.website && (
-                  <a 
-                    href={user.website} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-primary hover:bg-primary-dark text-white border border-primary shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <Globe className="h-4 w-4 text-white" />
-                    Website
-                  </a>
-                )}
+                {/* Quick links */}
+                <div className="flex flex-wrap gap-3 pt-2 justify-center md:justify-start">
+                  {user.github && (
+                    <a 
+                      href={user.github} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-slate-900 dark:bg-slate-950 hover:bg-slate-800 dark:hover:bg-slate-800 text-white border border-slate-800 dark:border-slate-900 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <Github className="h-4 w-4 text-white" />
+                      GitHub
+                    </a>
+                  )}
+                  {user.linkedin && (
+                    <a 
+                      href={user.linkedin} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-[#0A66C2] hover:bg-[#004182] text-white border border-[#0A66C2] shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <Linkedin className="h-4 w-4 text-white" />
+                      LinkedIn
+                    </a>
+                  )}
+                  {user.website && (
+                    <a 
+                      href={user.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-primary hover:bg-primary-dark text-white border border-primary shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <Globe className="h-4 w-4 text-white" />
+                      Website
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Profile Image card */}
+              <div className="relative shrink-0 group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary to-secondary rounded-full blur-md opacity-35 group-hover:scale-105 transition-all duration-300"></div>
+                <div className="h-48 w-48 rounded-full border-4 border-surface overflow-hidden shadow-2xl relative bg-surface">
+                  <img 
+                    src={user.profileImage 
+                      ? (user.profileImage.startsWith('/uploads/') ? `${API_URL}${user.profileImage}` : user.profileImage)
+                      : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250'} 
+                    alt={user.name} 
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87534a5a2?auto=format&fit=crop&q=80&w=250'; }}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Profile Image card */}
-            <div className="relative shrink-0 z-10 group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary to-secondary rounded-full blur-md opacity-35 group-hover:scale-105 transition-all duration-300"></div>
-              <div className="h-48 w-48 rounded-full border-4 border-surface overflow-hidden shadow-2xl relative bg-surface">
-                <img 
-                  src={user.profileImage || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250'} 
-                  alt={user.name} 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250'; }}
-                />
-              </div>
+            {/* Bottom Stats Grid */}
+            <div className="w-full border-t border-border/40 pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 z-10">
+              {[
+                { value: '3+', label: 'Years of Dev Active' },
+                { value: '4+', label: 'Specialties Built' },
+                { value: '90%+', label: 'Average Proficiency' },
+                { value: '100%', label: 'Clean Code Polish' }
+              ].map((stat, idx) => (
+                <div key={idx} className="text-center p-4 rounded-2xl bg-surface/30 hover:bg-surface/50 border border-border/20 transition-all select-none hover:scale-[1.02] shadow-sm">
+                  <div className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">{stat.value}</div>
+                  <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-text-muted mt-1">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -487,7 +694,10 @@ export default function PublicPortfolio() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Bio Card */}
-            <div className="md:col-span-2 clay-card p-6 flex flex-col justify-between">
+            <div 
+              onMouseMove={handleMouseMove}
+              className="md:col-span-2 clay-card spotlight-card p-6 flex flex-col justify-between"
+            >
               <div>
                 <h3 className="text-sm font-bold text-text uppercase tracking-wider mb-3">Biography</h3>
                 <p className="text-text-muted text-sm leading-relaxed font-normal">
@@ -522,7 +732,10 @@ export default function PublicPortfolio() {
             <div className="space-y-6">
               {/* Education */}
               {user.education && (
-                <div className="clay-card p-5">
+                <div 
+                  onMouseMove={handleMouseMove}
+                  className="clay-card spotlight-card p-5"
+                >
                   <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider mb-2">
                     <GraduationCap className="h-4.5 w-4.5" />
                     Education
@@ -535,7 +748,10 @@ export default function PublicPortfolio() {
 
               {/* Career Goals */}
               {user.careerGoals && (
-                <div className="clay-card p-5">
+                <div 
+                  onMouseMove={handleMouseMove}
+                  className="clay-card spotlight-card p-5"
+                >
                   <div className="flex items-center gap-2 text-secondary font-bold text-xs uppercase tracking-wider mb-2">
                     <Compass className="h-4.5 w-4.5" />
                     Focus & Aspirations
@@ -546,6 +762,15 @@ export default function PublicPortfolio() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Interactive Developer Terminal */}
+          <div className="w-full pt-4">
+            <div className="border-l-4 border-primary pl-4 mb-4">
+              <h3 className="text-sm font-bold text-text uppercase tracking-wider">Interactive Developer Console</h3>
+              <p className="text-text-muted text-[10px] mt-0.5">Direct sandbox to query stack registry, biography & project catalogs</p>
+            </div>
+            <DeveloperTerminal user={user} skills={data.skills} projects={projects} />
           </div>
         </section>
 
@@ -702,29 +927,7 @@ export default function PublicPortfolio() {
             </div>
           
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((test, idx) => (
-              <div 
-                key={idx} 
-                className="clay-card p-6 flex flex-col justify-between"
-              >
-                <p className="text-text-muted text-xs leading-relaxed italic font-medium">
-                  "{test.quote}"
-                </p>
-                <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border/60">
-                  <img 
-                    src={test.avatar} 
-                    alt={test.name} 
-                    className="h-9 w-9 rounded-full object-cover border border-border"
-                  />
-                  <div>
-                    <h4 className="text-xs font-bold text-text">{test.name}</h4>
-                    <span className="text-[10px] text-text-muted font-bold block">{test.role}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <TestimonialCarousel testimonials={testimonials} />
         </section>
 
         {/* 6. CONTACT SECTION */}
